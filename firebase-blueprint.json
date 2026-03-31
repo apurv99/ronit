@@ -1,0 +1,57 @@
+{
+  "entities": {
+    "NewsArticle": {
+      "title": "News Article",
+      "description": "A news article with content, metadata, and categorization.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "The headline of the news." },
+        "content": { "type": "string", "description": "The full body of the news article." },
+        "summary": { "type": "string", "description": "A short summary for previews." },
+        "category": { "type": "string", "description": "The category of the news (e.g., Politics, Sports)." },
+        "imageUrl": { "type": "string", "description": "URL to the main image." },
+        "author": { "type": "string", "description": "Name of the author." },
+        "authorId": { "type": "string", "description": "UID of the author." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last update timestamp." },
+        "isBreaking": { "type": "boolean", "description": "Whether it's breaking news." },
+        "isTrending": { "type": "boolean", "description": "Whether it's trending news." }
+      },
+      "required": ["title", "content", "category", "createdAt"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "A news category.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Display name of the category." },
+        "slug": { "type": "string", "description": "URL-friendly slug." }
+      },
+      "required": ["name", "slug"]
+    },
+    "User": {
+      "title": "User",
+      "description": "User profile with roles.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "description": "User's email." },
+        "role": { "type": "string", "enum": ["admin", "editor"], "description": "User's role." }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/news": {
+      "schema": "NewsArticle",
+      "description": "Collection of news articles."
+    },
+    "/categories": {
+      "schema": "Category",
+      "description": "Collection of news categories."
+    },
+    "/users": {
+      "schema": "User",
+      "description": "Collection of user profiles and roles."
+    }
+  }
+}

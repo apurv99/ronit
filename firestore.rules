@@ -1,0 +1,80 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: news
+    // Fields:
+    //   - title: string (required, < 200 chars)
+    //   - content: string (required, < 10000 chars)
+    //   - summary: string (optional, < 500 chars)
+    //   - category: string (required, < 50 chars)
+    //   - imageUrl: string (optional, URL format)
+    //   - author: string (optional, < 100 chars)
+    //   - authorId: string (optional, UID)
+    //   - createdAt: timestamp (required)
+    //   - updatedAt: timestamp (optional)
+    //   - isBreaking: bool (optional)
+    //   - isTrending: bool (optional)
+    //
+    // Collection: categories
+    // Fields:
+    //   - name: string (required, < 50 chars)
+    //   - slug: string (required, < 50 chars)
+    //
+    // Collection: users
+    // Fields:
+    //   - email: string (required, email format)
+    //   - role: string (required, enum: ['admin', 'editor'])
+    //
+    // Collection: settings
+    // Fields:
+    //   - siteName: string
+    //   - tickerSpeed: number
+    //   - contactEmail: string
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        (request.auth.token.email == "apurvhazra99@gmail.com" && request.auth.token.email_verified == true) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    // Rules
+    match /settings/site {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /news/{newsId} {
+      allow read: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /categories/{catId} {
+      allow read: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+  }
+}
